@@ -63,7 +63,7 @@ class HomeController {
         $humeurs = $this->DonneesService->viewMoodsPagination($pdo, $infos['util'], $premier, $parPage);
 
         //Création de la vue et set vraiable
-        $view = new View("pink-check-your-mood-pink1/views/humeurs");
+        $view = new View("check-your-mood/views/humeurs");
         $view->setVar('humeurs',$humeurs);
         $view->setVar('libelles',$libelles);
         $view->setVar('updateOk',true);
@@ -81,7 +81,7 @@ class HomeController {
 
     public function index() {
 
-        $view = new View("pink-checkyourmood-pink1/views/accueil");
+        $view = new View("check-your-mood/views/accueil");
         return $view;
     }
 
