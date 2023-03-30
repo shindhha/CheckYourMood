@@ -11,7 +11,7 @@ use yasmf\DataSource;
 use yasmf\Router;
 
 $dataSource = new DataSource(
-    $host = '172.20.0.3',
+    $host = 'localhost',
     $port = '3306', # to change with the port your mySql server listen to
     $db = 'check_your_mood', # to change with your db name
     $user = 'root', # to change with your db user name
