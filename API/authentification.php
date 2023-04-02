@@ -2,10 +2,6 @@
 	require_once("donnees.php");
 
 	/**
-	 * Fonctions permettant l'authentification a l'API 
-	 */
-
-	/**
 	 * Fonction qui permet de verifier la clé de l'API renseignée par l'utilisateur est valide
 	 */
 	function authentification() {
@@ -57,7 +53,7 @@
 		$stmt->execute([$login, md5($password)]);
 
 		$user = $stmt->fetch();
-		
+
         if ($user != null) {
 			// Genération de la clé, ou récupération de l'existante
 			if ($user['cleAPI'] != null) {
@@ -79,7 +75,7 @@
 				} catch (Exception $e) {
 					$e->getMessage();
 					$pdo->rollBack();
-					$infos['ERREUR'] = $e;
+					$infos['message'] = "Erreur interne.";
 					sendJSON($infos, 400);
 				}
 			}
@@ -87,7 +83,7 @@
 		} else {
 			// Login incorrect
 			$infos['Statut']="KO";
-			$infos['message']="Logins incorrects.";
+			$infos['message']="Identifiant / mot de passe incorrects.";
 			sendJSON($infos, 401) ;
 			die();
 		}

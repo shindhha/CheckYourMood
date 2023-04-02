@@ -1,15 +1,11 @@
 <?php
 	/**
-	 * Fonctions permettant d'extraire les données de la base de donnée
-	 */
-
-	/**
 	 * Fonction qui permet de creer un objet PDO pour interagir avec la base de donnée
 	 */
 	function getPDO(){
 
 		// Retourne un objet connexion à la BD
-		$host='127.0.0.1';	// Serveur de BD
+		$host='localhost';	// Serveur de BD
 		$db='check_your_mood';		// Nom de la BD
 		$user='root';		// User 
 		$pass='root';		// Mot de passe
@@ -30,7 +26,7 @@
 		} catch(PDOException $e){
 			//Il y a eu une erreur de connexion
 			$infos['Statut']="KO";
-			$infos['message']="Problème connexion base de données";
+			$infos['message']="Impossible de se connecter à la base de données";
 			sendJSON($infos, 500) ;
 			die();
 		}
@@ -48,6 +44,7 @@
 		if ($stmt->rowCount() == 0) {
 			return $clefATester;
 		}
+        return null;
 	}
 	/**
 	 * Fonction qui permet de generer une clé aléatoire pour l'API et appele verifApiKey
@@ -86,11 +83,12 @@
 			if ($nb!=0) {
 				sendJSON($humeurs, 200) ;
 			} else {
+                // Normalement on ne devrait jamais arriver ici (car la clé est vérifiée avant)
 				sendJSON($humeurs, 404) ;
 			}
 		} catch(PDOException $e){
 			$infos['Statut']="KO";
-			$infos['message']=$e->getMessage();
+			$infos['message']="Erreur lors de la récupération des données.";
 			sendJSON($infos, 500) ;
 		}
 	}
@@ -102,7 +100,7 @@
 		try {
 			$pdo=getPDO();
 
-			$maRequete="SELECT libelleHumeur, emoji FROM libelle"; 
+			$maRequete="SELECT codeLibelle, libelleHumeur, emoji FROM libelle";
 			
 			$stmt = $pdo->prepare($maRequete);
 			$stmt->execute([]);	
@@ -121,7 +119,7 @@
 			}
 		} catch(PDOException $e){
 			$infos['Statut']="KO";
-			$infos['message']=$e->getMessage();
+			$infos['message']="Erreur lors de la récupération des données.";
 			sendJSON($infos, 500) ;
 		}
 	}
@@ -149,13 +147,14 @@
 			if ($nb!=0) {
 				sendJSON($user, 200);
 			} else {
+                // Normalement on ne devrait jamais arriver ici (car la clé est vérifiée avant)
 				$infos['Statut']="KO";
 				$infos['message']="Utilisateur non trouvé";
 				sendJSON($infos, 404);
 			}
 		} catch(PDOException $e){
 			$infos['Statut']="KO";
-			$infos['message']=$e->getMessage();
+			$infos['message']="Erreur lors de la récupération des données.";
 			sendJSON($infos, 500) ;
 		}
 	
@@ -181,9 +180,17 @@
 	
 			sendJSON(array('Statut' => "OK"), 200);
 		} catch(PDOException $e){
-			$infos['Statut']="KO";
-			$infos['message']=$e->getMessage();
-			sendJSON($infos, 500) ;
+
+            // Vérification si l'erreur ne vient pas des triggers sur l'heure
+            if ($e->getCode() == 45000) {
+                $infos['Statut']="KO";
+                $infos['message']="L'heure entrée ne rentre pas dans l'intervalle autorisé de 24h";
+                sendJSON($infos, 400);
+            } else {
+                $infos['Statut']="KO";
+                $infos['message']="Erreur interne lors de l'ajout de l'humeur";
+                sendJSON($infos, 500) ;
+            }
 		}
 	}
 	

@@ -58,7 +58,7 @@
 				
 					default : 
 						$infos['Statut']="KO";
-						$infos['message']=$url[0]."inexistant";
+						$infos['message']="Point de terminaison '".$url[0]."' inexistant";
 						sendJSON($infos, 404) ;
 				}
 			} else {
@@ -81,7 +81,7 @@
 						break ;
 					default : 
 						$infos['Statut']="KO";
-						$infos['message']="'".$url[0]."' inexistant";
+						$infos['message']="Point de terminaison '".$url[0]."' inexistant";
 						sendJSON($infos, 404) ;
 				}	
 			} else {
