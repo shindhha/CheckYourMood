@@ -1,14 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.4.1
--- http://www.phpmyadmin.net
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
 --
--- Client :  localhost
--- Généré le :  Ven 13 Janvier 2023 à 09:24
--- Version du serveur :  5.7.11
--- Version de PHP :  7.0.3
+-- Hôte : 172.20.0.3
+-- Généré le : mar. 04 avr. 2023 à 09:48
+-- Version du serveur : 8.0.32
+-- Version de PHP : 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+01:00";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,11 +18,8 @@ SET time_zone = "+01:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données :  `check_your_mood`
+-- Base de données : `check_your_mood`
 --
-DROP DATABASE IF EXISTS check_your_mood ; 
-CREATE DATABASE IF NOT EXISTS `check_your_mood` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `check_your_mood`;
 
 -- --------------------------------------------------------
 
@@ -30,16 +28,16 @@ USE `check_your_mood`;
 --
 
 CREATE TABLE `humeur` (
-  `codeHumeur` int(11) NOT NULL,
-  `libelle` int(2) NOT NULL,
+  `codeHumeur` int NOT NULL,
+  `libelle` int NOT NULL,
   `dateHumeur` date NOT NULL,
   `heure` time NOT NULL,
-  `idUtil` int(11) NOT NULL,
+  `idUtil` int NOT NULL,
   `contexte` blob
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
--- Contenu de la table `humeur`
+-- Déchargement des données de la table `humeur`
 --
 
 INSERT INTO `humeur` (`codeHumeur`, `libelle`, `dateHumeur`, `heure`, `idUtil`, `contexte`) VALUES
@@ -3049,54 +3047,69 @@ INSERT INTO `humeur` (`codeHumeur`, `libelle`, `dateHumeur`, `heure`, `idUtil`, 
 (2998, 7, '2021-10-17', '12:05:59', 1, 0x436f6e7465787465206465206c2768756d6575722028c3a0206d6f64696669657229),
 (2999, 7, '2022-11-03', '12:49:53', 1, 0x436f6e7465787465206465206c2768756d6575722028c3a0206d6f64696669657229),
 (3000, 12, '2021-10-27', '00:37:41', 1, 0x436f6e7465787465206465206c2768756d6575722028c3a0206d6f64696669657229),
-(3001, 2, '2023-01-13', '09:00:00', 1, NULL);
+(3001, 2, '2023-03-25', '16:00:00', 1, 0x7465787465207472c3a873207472c3a873207472c3a873207472c3a873207472c3a873207472c3a873207472c3a873207472c3a873207472c3a873206c6f6e670a),
+(3002, 1, '2023-02-20', '10:37:42', 6, ''),
+(3003, 8, '2023-02-20', '10:37:48', 6, 0x6d61726368652070617320746f70),
+(3004, 1, '2023-02-23', '09:54:34', 6, 0x266c743b7363726970742667743b616c657274282671756f743b636f75636f752671756f743b293b266c743b2f7363726970742667743b),
+(3005, 1, '2023-02-23', '10:05:27', 6, 0x266c743b7363726970742667743b616c657274282671756f743b636f75636f752671756f743b293b266c743b2f7363726970742667743b),
+(3006, 15, '2023-03-06', '14:09:29', 6, ''),
+(3007, 8, '2023-03-17', '08:19:23', 6, NULL),
+(3008, 8, '2023-03-17', '08:19:23', 6, 0x436f75636f75),
+(3009, 9, '2023-03-26', '11:10:23', 6, 0x7465737420646570756973206c274150492032),
+(3011, 1, '2023-03-26', '18:40:40', 1, 0x7361206d6172636865203f),
+(3012, 1, '2023-03-26', '18:40:40', 1, 0x7361206d6172636865203f),
+(3013, 10, '2023-03-27', '13:07:00', 1, 0x74657374),
+(3014, 17, '2023-03-27', '14:33:00', 1, 0x6a6a6a6a6a6a6a),
+(3015, 10, '2023-03-27', '16:28:00', 1, 0x766a6b796b7a6567686a61657a6b),
+(3020, 1, '2023-03-31', '19:31:00', 1, 0x7465737444617465);
 
 --
 -- Déclencheurs `humeur`
 --
 DELIMITER $$
-CREATE TRIGGER `check_date_time_range_insert` BEFORE INSERT ON `humeur`
-    FOR EACH ROW
-    BEGIN
-    DECLARE diff INT;
-    SET diff = TIMESTAMPDIFF(HOUR, NOW(), NEW.dateHumeur);
-    IF diff > 24 OR diff < -24 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne peut pas dépasser une plage horaire de 24 heures par rapport à la date actuelle';
+CREATE TRIGGER `check_date_time_range_insert` BEFORE INSERT ON `humeur` FOR EACH ROW BEGIN
+
+    SET @date = NEW.dateHumeur;
+    SET @heure = NEW.heure;
+
+    SET @datetime = CAST(CONCAT(@date, ' ', @heure) AS DATETIME);
+
+    # Vérification que la date ne soit pas inférieure à 24 heure
+    IF @datetime < DATE_SUB(NOW(), INTERVAL 24 HOUR) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne doit pas être inférieure à 24 heure';
+    END IF;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `check_date_time_range_update` BEFORE UPDATE ON `humeur` FOR EACH ROW BEGIN
+    SET @date = NEW.dateHumeur;
+    SET @heure = NEW.heure;
+
+    SET @datetime = CAST(CONCAT(@date, ' ', @heure) AS DATETIME);
+
+    # Vérification que la date ne soit pas inférieure à 24 heure
+    IF @datetime < DATE_SUB(NOW(), INTERVAL 24 HOUR) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne doit pas être inférieure à 24 heure';
     END IF;
 END
 $$
 DELIMITER ;
-
 DELIMITER $$
 CREATE TRIGGER `verifier_date_heure_insert` BEFORE INSERT ON `humeur` FOR EACH ROW BEGIN
     IF NEW.dateHumeur > CURRENT_DATE OR (NEW.dateHumeur = CURRENT_DATE AND NEW.heure > CURRENT_TIME) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date et l''heure ne peuvent pas dépasser l''heure actuelle';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne doit pas dépasser l heure actuelle';
     END IF;
 END
 $$
 DELIMITER ;
-
 DELIMITER $$
-CREATE TRIGGER `verifier_date_heure_update` BEFORE  UPDATE ON `humeur` FOR EACH ROW BEGIN
+CREATE TRIGGER `verifier_date_heure_update` BEFORE UPDATE ON `humeur` FOR EACH ROW BEGIN
     IF NEW.dateHumeur > CURRENT_DATE OR (NEW.dateHumeur = CURRENT_DATE AND NEW.heure > CURRENT_TIME) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date et l''heure ne peuvent pas dépasser l''heure actuelle';
-END IF;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne doit pas dépasser l heure actuelle';
+    END IF;
 END
-$$
-DELIMITER ;
-
-
-DELIMITER $$
-CREATE TRIGGER check_date_time_range_update
-    BEFORE UPDATE ON humeur
-                         FOR EACH ROW
-BEGIN
-    DECLARE diff INT;
-    SET diff = TIMESTAMPDIFF(HOUR, NOW(), NEW.dateHumeur);
-    IF diff > 24 OR diff < -24 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne peut pas dépasser une plage horaire de 24 heures par rapport à la date actuelle';
-END IF;
-END;
 $$
 DELIMITER ;
 
@@ -3107,13 +3120,13 @@ DELIMITER ;
 --
 
 CREATE TABLE `libelle` (
-  `codeLibelle` int(2) NOT NULL,
-  `libelleHumeur` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `emoji` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL
+  `codeLibelle` int NOT NULL,
+  `libelleHumeur` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `emoji` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Contenu de la table `libelle`
+-- Déchargement des données de la table `libelle`
 --
 
 INSERT INTO `libelle` (`codeLibelle`, `libelleHumeur`, `emoji`) VALUES
@@ -3152,23 +3165,27 @@ INSERT INTO `libelle` (`codeLibelle`, `libelleHumeur`, `emoji`) VALUES
 --
 
 CREATE TABLE `utilisateur` (
-  `codeUtil` int(11) NOT NULL,
+  `codeUtil` int NOT NULL,
   `prenom` varchar(30) NOT NULL,
   `nom` varchar(30) NOT NULL,
   `identifiant` varchar(30) NOT NULL,
   `mail` varchar(30) NOT NULL,
-  `motDePasse` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `motDePasse` varchar(200) NOT NULL,
+  `cleAPI` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
--- Contenu de la table `utilisateur`
+-- Déchargement des données de la table `utilisateur`
 --
 
-INSERT INTO `utilisateur` (`codeUtil`, `prenom`, `nom`, `identifiant`, `mail`, `motDePasse`) VALUES
-(1, 'Jules', 'Blanchard', 'jules22b', 'jules.blanchard@iut-rodez.fr', MD5('test'));
+INSERT INTO `utilisateur` (`codeUtil`, `prenom`, `nom`, `identifiant`, `mail`, `motDePasse`, `cleAPI`) VALUES
+(1, 'Jules', 'Blanchard', 'jules22b', 'jules.blanchard@iut-rodez.fr', '363b122c528f54df4a0446b6bab05515', '0CKwcyvhlfcW9fc9iAYrERe6l0aCJORCU5yb0DWfuxaSd93Uws4trCXmnSovFx1i6YDTBz2bJxVwtmcnmTqvCdHsqBRTCCvJ5ucn'),
+(6, 'Simon', 'LAUNAY', 'Simon', 'launay.simon@outlook.com', '202cb962ac59075b964b07152d234b70', 'xpiMuMgflun6SSlhl9dkJXU05QmukywKjhIS75l5MusSiiFW0sjpIPe1KPNHY2gQ1LC3Jix9anjjQWLIViOn1uedgmGgh6DzteZj'),
+(7, 'machin', 'bidule', 'bidule', 'truc@gmail.com', '202cb962ac59075b964b07152d234b70', 'kdkfjejfopofhozeoiaOJFOIUIAEUROIAuoeufoiZEUFPOEZHFIpoqjfp$E65Z4F6Z4F5EZF468ZE1F65E1Z6F46Z8E'),
+(8, 'guigiu', 'guigui', 'guigui', 'guigui@guigui.gui', '202cb962ac59075b964b07152d234b70', '');
 
 --
--- Index pour les tables exportées
+-- Index pour les tables déchargées
 --
 
 --
@@ -3193,26 +3210,29 @@ ALTER TABLE `utilisateur`
   ADD UNIQUE KEY `contrainte_identifiant` (`identifiant`);
 
 --
--- AUTO_INCREMENT pour les tables exportées
+-- AUTO_INCREMENT pour les tables déchargées
 --
 
 --
 -- AUTO_INCREMENT pour la table `humeur`
 --
 ALTER TABLE `humeur`
-  MODIFY `codeHumeur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3002;
+  MODIFY `codeHumeur` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3021;
+
 --
 -- AUTO_INCREMENT pour la table `libelle`
 --
 ALTER TABLE `libelle`
-  MODIFY `codeLibelle` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `codeLibelle` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
 --
 -- AUTO_INCREMENT pour la table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  MODIFY `codeUtil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `codeUtil` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
 --
--- Contraintes pour les tables exportées
+-- Contraintes pour les tables déchargées
 --
 
 --
@@ -3221,6 +3241,7 @@ ALTER TABLE `utilisateur`
 ALTER TABLE `humeur`
   ADD CONSTRAINT `fk_Humeur_Libelle` FOREIGN KEY (`libelle`) REFERENCES `libelle` (`codeLibelle`),
   ADD CONSTRAINT `fk_Humeur_Utilisateur` FOREIGN KEY (`idUtil`) REFERENCES `utilisateur` (`codeUtil`);
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
