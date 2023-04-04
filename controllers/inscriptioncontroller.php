@@ -1,41 +1,42 @@
 <?php
 namespace controllers;
-
-use services\InscriptionService;
+require_once 'modeles/User.php';
+use Modeles\QueryBuilder;
 use yasmf\HttpHelper;
+use yasmf\HttpHelper\getParam;
 use yasmf\View;
-
+use Modeles\User;
 class InscriptionController {
 
-    private $inscriptionService;
 
-    public function __construct()
-    {
-        $this->inscriptionService = InscriptionService::getDefaultInscriptionService();
-    }
+    public function signin($pdo,$userTest = null) {
 
-    //
-    public function signin($pdo) {
+        $user = $userTest === null ? new User() : $userTest;
+        $view = new View("check-your-mood/views/inscription");
+        $data['identifiant'] = htmlspecialchars(HttpHelper::getParam('identifiant'));
+        $data['motDePasse'] = htmlspecialchars(HttpHelper::getParam('motdepasse'));
+        $data['mail'] = htmlspecialchars(HttpHelper::getParam('mail'));
+        $data['nom'] = htmlspecialchars(HttpHelper::getParam('nom'));
+        $data['prenom'] = htmlspecialchars(HttpHelper::getParam('prenom'));
 
-        $id = htmlspecialchars(HttpHelper::getParam('identifiant'));
-        $mdp = htmlspecialchars(HttpHelper::getParam('motdepasse'));
-        $mail = htmlspecialchars(HttpHelper::getParam('mail'));
-        $nom = htmlspecialchars(HttpHelper::getParam('nom'));
-        $prenom = htmlspecialchars(HttpHelper::getParam('prenom'));
-        
-        if( $id == "" || $mdp == "" || $mail == "" || $nom == "" || $prenom == ""){
-            $insertOk = "nOk";
-        }else{
-            $insertOk = $this->inscriptionService->inscription($pdo,$id,$mdp,$mail,$nom,$prenom);
+        if ($data['identifiant'] == "" || $data['motDePasse'] == ""
+            || $data['mail'] == ""     || $data['nom'] == ""  || $data['prenom'] == "") {
+            return $view;
         }
+        $user->fill($data);
+        $user->motDePasse = md5($data['motDePasse']);
 
-        if($insertOk == "nOk"){
-            $view = new View("check-your-mood/views/inscription");
+        QueryBuilder::setDBSource($pdo);
+        try {
+            $user->save();
+        } catch (\PDOException $e) {
             return $view;
         }
 
         $view = new View("check-your-mood/views/connexion");
         return $view;
     }
+
+
 
 }

@@ -3055,21 +3055,18 @@ INSERT INTO `humeur` (`codeHumeur`, `libelle`, `dateHumeur`, `heure`, `idUtil`, 
 -- Déclencheurs `humeur`
 --
 DELIMITER $$
-CREATE TRIGGER `check_date_time_range_insert` BEFORE INSERT ON `humeur` FOR EACH ROW BEGIN
-    IF NEW.dateHumeur  + INTERVAL 1 day < CURRENT_DATE OR NEW.heure  + INTERVAL 1 hour > CURRENT_TIME THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date et l''heure depassent la plage de 24 heures';
+CREATE TRIGGER `check_date_time_range_insert` BEFORE INSERT ON `humeur`
+    FOR EACH ROW
+    BEGIN
+    DECLARE diff INT;
+    SET diff = TIMESTAMPDIFF(HOUR, NOW(), NEW.dateHumeur);
+    IF diff > 24 OR diff < -24 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne peut pas dépasser une plage horaire de 24 heures par rapport à la date actuelle';
     END IF;
 END
 $$
 DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `check_date_time_range_update` BEFORE UPDATE ON `humeur` FOR EACH ROW BEGIN
-    IF NEW.dateHumeur  + INTERVAL 1 day < CURRENT_DATE OR NEW.heure  + INTERVAL 1 hour > CURRENT_TIME THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date et l''heure depassent la plage de 24 heures';
-    END IF;
-END
-$$
-DELIMITER ;
+
 DELIMITER $$
 CREATE TRIGGER `verifier_date_heure_insert` BEFORE INSERT ON `humeur` FOR EACH ROW BEGIN
     IF NEW.dateHumeur > CURRENT_DATE OR (NEW.dateHumeur = CURRENT_DATE AND NEW.heure > CURRENT_TIME) THEN
@@ -3078,12 +3075,28 @@ CREATE TRIGGER `verifier_date_heure_insert` BEFORE INSERT ON `humeur` FOR EACH R
 END
 $$
 DELIMITER ;
+
 DELIMITER $$
-CREATE TRIGGER `verifier_date_heure_update` BEFORE UPDATE ON `humeur` FOR EACH ROW BEGIN
+CREATE TRIGGER `verifier_date_heure_update` BEFORE  UPDATE ON `humeur` FOR EACH ROW BEGIN
     IF NEW.dateHumeur > CURRENT_DATE OR (NEW.dateHumeur = CURRENT_DATE AND NEW.heure > CURRENT_TIME) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date et l''heure ne peuvent pas dépasser l''heure actuelle';
-    END IF;
+END IF;
 END
+$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER check_date_time_range_update
+    BEFORE UPDATE ON humeur
+                         FOR EACH ROW
+BEGIN
+    DECLARE diff INT;
+    SET diff = TIMESTAMPDIFF(HOUR, NOW(), NEW.dateHumeur);
+    IF diff > 24 OR diff < -24 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La date ne peut pas dépasser une plage horaire de 24 heures par rapport à la date actuelle';
+END IF;
+END;
 $$
 DELIMITER ;
 
@@ -3152,7 +3165,7 @@ CREATE TABLE `utilisateur` (
 --
 
 INSERT INTO `utilisateur` (`codeUtil`, `prenom`, `nom`, `identifiant`, `mail`, `motDePasse`) VALUES
-(1, 'Jules', 'Blancha', 'jules22b', 'jules.blanchard@iut-rodez.fr', 'f030138d7873bcf595996725141f3801');
+(1, 'Jules', 'Blanchard', 'jules22b', 'jules.blanchard@iut-rodez.fr', MD5('test'));
 
 --
 -- Index pour les tables exportées

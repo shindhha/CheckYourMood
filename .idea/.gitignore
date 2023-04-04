@@ -6,3 +6,6 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+php-test-framework.xml
+php.xml
+modules.xml
