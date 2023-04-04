@@ -8,7 +8,6 @@ use yasmf\View;
 use Modeles\User;
 class InscriptionController {
 
-
     public function signin($pdo,$userTest = null) {
 
         $user = $userTest === null ? new User() : $userTest;

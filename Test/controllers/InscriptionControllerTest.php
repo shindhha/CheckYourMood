@@ -23,7 +23,7 @@ class InscriptionControllerTest extends \PHPUnit\Framework\TestCase
         $this->pdo = DataBase::getPDOTest();
         $this->pdo->beginTransaction();
         $this->user = $this->createStub(Modeles\User::class);
-        $this->inscriptioncontroller = new \controllers\InscriptionController($this->inscriptionService);
+        $this->inscriptioncontroller = new \controllers\InscriptionController();
     }
 
     protected function tearDown(): void

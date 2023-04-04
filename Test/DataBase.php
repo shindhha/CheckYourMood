@@ -16,7 +16,6 @@ class DataBase
             );
             return $dataSource->getPDO();
         }catch(PDOException $e){
-            $e->getMessage();
             return null;
         }
         

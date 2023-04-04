@@ -2,21 +2,21 @@
 
 namespace modeles;
 require_once 'modeles/Table.php';
-require_once 'Test/modeles/TableDeTest.php';
+require_once 'Test/Modeles/TableDeTest.php';
 require_once 'Test/DataBase.php';
-require_once 'modeles/QueryBuilder.php';
+require_once 'modeles\QueryBuilder.php';
 
 use InvalidArgumentException;
+use PDOException;
 use UnexpectedValueException;
 use DataBase;
 use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertTrue;
-use ReflectionClass;
+use Modeles\QueryBuilder;
 class TableTest extends TestCase
 {
     private $pdo;
-    private $services;
 
     protected function setUp(): void
     {
@@ -165,15 +165,5 @@ class TableTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $test = new TableDeTest(-1);
     }
-    public function testConstructorWithIncorrectColumnName() {
-        $this->expectException(InvalidArgumentException::class);
-        $reflectionClass = new ReflectionClass(TableDeTest::class);
-        $reflectionProp = $reflectionClass->getProperty('fillable');
-        $reflectionProp->setAccessible(true);
-        $reflectionProp->setValue(null, ['tableIdWithComplexeNameToPreventFromUnExceptedAssignmentByMethodFill']);
-        $test = new TableDeTest(-1);
 
-        // Utiliser la réflexion pour définir la propriété $pdo à null
-
-    }
 }

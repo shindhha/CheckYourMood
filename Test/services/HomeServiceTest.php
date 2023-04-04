@@ -38,7 +38,7 @@ class HomeServiceTest extends TestCase
             "nom" => "nomTest1",
             "prenom" => "prenomTest1",
             "mail" => "mail.test@test.test",
-            "util" => 10
+            "util" => 1
 
         ];
         $result = $this->service->connexion($this->pdo, $idUtil, $mdpUtil);

@@ -3,8 +3,6 @@
 namespace services;
 
 use DataBase;
-use Modeles\Humeur;
-use Modeles\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
 require_once 'yasmf/datasource.php';
@@ -14,7 +12,8 @@ require_once 'services/MoodService.php';
 
 require_once 'Test/DataBase.php';
 use PDOStatement;
-
+use function PHPUnit\Framework\assertEquals;
+use Modeles\QueryBuilder;
 class HumeurServiceTest extends TestCase
 {
     private $pdo;
@@ -52,7 +51,7 @@ class HumeurServiceTest extends TestCase
 
         // Assertions
         $this->assertInstanceOf(PDOStatement::class, $result);
-        $this->assertTrue($result->fetchAll() >= 1);
+        assertEquals($result->rowCount(), 11);
     }
 
     public function testViewMoodsWithNoMoods()

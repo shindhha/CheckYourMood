@@ -2,7 +2,7 @@
 
 namespace modeles;
 require_once 'modeles/Table.php';
-
+use Modeles\Table;
 class TableDeTest extends Table
 {
     protected $tableName = "tests";

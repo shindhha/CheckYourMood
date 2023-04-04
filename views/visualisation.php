@@ -45,7 +45,7 @@
                 name: <?php echo '"'.$anneeComparaison.'"';?>,
                 indexLabel: "{y}",
                 showInLegend: true,
-                dataPoints: <?php echo json_encode($dataPoints2, JSON_NUMERIC_CHECK); ?>
+                dataPoints: <?php echo json_encode($dataPoints2, JSON_NUMERIC_CHECK); var_dump($dataPoints2);?>
             },{
                 type: "column",
                 name: <?php echo '"'.$anneeChoisi.'"';?>,

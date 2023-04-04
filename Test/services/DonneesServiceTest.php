@@ -4,27 +4,22 @@ namespace services;
 require_once 'yasmf/datasource.php';
 require_once 'services/DonneesService.php';
 require_once 'Test/DataBase.php';
-require_once 'services/MoodService.php';
 require_once 'modeles/User.php';
 use DataBase;
-use Modeles\Humeur;
 use Modeles\QueryBuilder;
 use Modeles\User;
 use PHPUnit\Framework\TestCase;
 use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertTrue;
 
 class DonneesServiceTest extends TestCase
 {
     private $pdo;
     private $services;
-    private $moodService;
-    private $idUserTest = 10;
+    private $idUserTest = 1;
 
     protected function setUp(): void
     {
         $this->services = DonneesService::getDefaultDonneesService();
-        $this->moodService = MoodService::getDefaultMoodService();
         $this->pdo = DataBase::getPDOTest();
         $this->pdo->beginTransaction();
         QueryBuilder::setDBSource($this->pdo);
@@ -120,7 +115,7 @@ class DonneesServiceTest extends TestCase
         // Appeler la fonction à tester
         $result = $this->services->nombreHumeur($this->pdo, $idUtil);
         // Assertion pour vérifier le résultat attendu
-        $this->assertTrue($result    >= 200);
+        $this->assertTrue($result ==11);
     }
 
     public function testUpdateMdp()
@@ -155,7 +150,8 @@ class DonneesServiceTest extends TestCase
 
         $idUtil = 1;
         $user = new User($idUtil);
-        $mdpAttendu = "098f6bcd4621d373cade4e832627b4f6";
+
+        $mdpAttendu = "9aaf575815b9cc742b568924d5bc68a5";
         // Excepted On récupère son mot de passe
         $user->fetch('motDePasse');
         $this->assertEquals($mdpAttendu, $user->motDePasse);

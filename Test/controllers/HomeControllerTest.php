@@ -7,19 +7,18 @@ require_once 'Test/DataBase.php';
 use controllers\HomeController;
 use Modeles\QueryBuilder;
 use PHPUnit\Framework\TestCase;
-use services\donneesservice;
-use services\homeservice;
-use services\moodservice;
-use yasmf\DataSource;
+use services\DonneesService;
+use services\HomeService;
+use services\MoodService;
 use yasmf\View;
 
 
 class HomeControllerTest extends TestCase
 {
     private PDO $pdo;
-    private homeservice $HomeService;
-    private donneesservice $DonneesService;
-    private moodservice $MoodService;
+    private HomeService $HomeService;
+    private DonneesService $DonneesService;
+    private MoodService $MoodService;
     private PDOStatement $PDOStatement;
     private HomeController $homeController;
 

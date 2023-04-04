@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS check_your_mood_test ;
+CREATE DATABASE IF NOT EXISTS `check_your_mood_test` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `check_your_mood_test`;
+
 CREATE TABLE Tests (
     id INTEGER PRIMARY KEY,
     nomTest VARCHAR(255),
@@ -58,5 +62,67 @@ CREATE TABLE `utilisateur` (
                                `motDePasse` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO utilisateur (prenom,nom,pseudo,identifiant,mail,motDePasse) VALUES ('prenomTest1','nomTest1','idTest1','mail.test@test.test',MD5('TestMotDePasse'));
+
+
+ALTER TABLE `humeur`
+    ADD PRIMARY KEY (`codeHumeur`),
+    ADD KEY `fk_Humeur_Libelle` (`libelle`),
+    ADD KEY `fk_Humeur_Utilisateur` (`idUtil`);
+
+--
+-- Index pour la table `libelle`
+--
+ALTER TABLE `libelle`
+    ADD PRIMARY KEY (`codeLibelle`);
+
+--
+-- Index pour la table `utilisateur`
+--
+ALTER TABLE `utilisateur`
+    ADD PRIMARY KEY (`codeUtil`),
+    ADD UNIQUE KEY `contrainte_identifiant` (`identifiant`);
+
+--
+-- AUTO_INCREMENT pour les tables exportées
+--
+
+--
+-- AUTO_INCREMENT pour la table `humeur`
+--
+ALTER TABLE `humeur`
+    MODIFY `codeHumeur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT pour la table `libelle`
+--
+ALTER TABLE `libelle`
+    MODIFY `codeLibelle` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT pour la table `utilisateur`
+--
+ALTER TABLE `utilisateur`
+    MODIFY `codeUtil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- Contraintes pour les tables exportées
+--
+
+--
+-- Contraintes pour la table `humeur`
+--
+ALTER TABLE `humeur`
+    ADD CONSTRAINT `fk_Humeur_Libelle` FOREIGN KEY (`libelle`) REFERENCES `libelle` (`codeLibelle`),
+    ADD CONSTRAINT `fk_Humeur_Utilisateur` FOREIGN KEY (`idUtil`) REFERENCES `utilisateur` (`codeUtil`);
+
+INSERT INTO utilisateur (prenom,nom,identifiant,mail,motDePasse) VALUES ('prenomTest1','nomTest1','idTest1','mail.test@test.test',MD5('TestMotDePasse'));
 SET time_zone = "+01:00";
+
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (1,'2021-01-01','00:00:00',1,'contexteTest1');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (1,'2021-01-01','00:40:00',1,'contexteTest2');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (1,'2021-01-01','01:00:00',1,'contexteTest3');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (2,'2021-01-01','01:40:00',1,'contexteTest4');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (2,'2021-01-01','02:00:00',1,'contexteTest5');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (7,'2021-02-01','02:40:00',1,'contexteTest6');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (13,'2022-01-01','03:00:00',1,'contexteTest7');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (22,'2023-03-01','03:40:00',1,'contexteTest8');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (18,'2022-01-01','04:00:00',1,'contexteTest9');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (11,'2021-01-25','04:40:00',1,'contexteTest10');
+INSERT INTO humeur (libelle,dateHumeur,heure,idUtil,contexte) VALUES (19,'2021-01-02','05:00:00',1,'contexteTest11');

@@ -2,8 +2,6 @@
 
 namespace modeles;
 use DataBase;
-use Models\Table;
-use Models\User;
 use PHPUnit\Framework\TestCase;
 use services\Mood;
 use function PHPUnit\Framework\assertEquals;
@@ -12,10 +10,10 @@ require_once 'modeles/Table.php';
 require_once 'modeles/QueryBuilder.php';
 require_once 'yasmf/datasource.php';
 use UnexpectedValueException;
+use Modeles\QueryBuilder;
 class QueryBuilderTest extends TestCase
 {
     private $pdo;
-    private $services;
 
     protected function setUp(): void
     {
@@ -54,6 +52,10 @@ class QueryBuilderTest extends TestCase
         // EXCEPTED On obtient la requete attendue
         assertEquals("UPDATE utilisateur SET nom = :nom,prenom = :prenom,identifiant = :identifiant", $query->getQuery());
     }
+
+
+
+
 
     public function testInsert()
     {
@@ -113,9 +115,8 @@ class QueryBuilderTest extends TestCase
         // Et on obtient la requete correspondante
         assertEquals("UPDATE utilisateur SET nom = :nom WHERE prenom = :prenom", $query->getQuery());
     }
-
-    // TODO Corriger le QueryBuilder
-    public function test2WhereWithSameName()
+    // TODO : Implementer la fonctionnalité
+    public function test2WhereWithAlias()
     {
         // GIVEN Un objet QueryBuilder sur lequel on appele
         // la méthode where deux fois en spécifiant la même colonne
@@ -125,7 +126,7 @@ class QueryBuilderTest extends TestCase
         // WHEN  on appeles la méthode getParams
         $params = $query->getParams();
         // THEN  on récupère les paramètres précédement donner
-        assertEquals(['prenom' => 'Guillaume', 'prenom' => 'Clement'], $params);
+        assertEquals(['prenom1' => 'Guillaume', 'prenom2' => 'Clement'], $params);
         // Et on obtient la requete correspondante en différentient les clés
         assertEquals("SELECT * FROM utilisateur WHERE prenom = :prenom1 AND prenom = :prenom2", $query->getQuery());
     }

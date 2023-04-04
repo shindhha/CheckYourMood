@@ -9,7 +9,7 @@ class QueryBuilder
     // La requete construite
     private mixed $query;
     // Objet PDO établissant la connexion a la base de données
-    private static ?PDO $pdo;
+    public static ?PDO $pdo;
     // Champ souhaiter lors d'une requete select
     private array $fields;
     // Parametre généraux de la requete

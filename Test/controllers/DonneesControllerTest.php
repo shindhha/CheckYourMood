@@ -23,7 +23,7 @@ class DonneesControllerTest extends TestCase
     private DonneesService $donneesService;
     private MoodService $moodService;
     private DonneesController $donneesController;
-
+    private VisualisationService $visualisationService;
     protected function setUp(): void
     {
         $this->pdo = DataBase::getPDOTest();
@@ -43,11 +43,13 @@ class DonneesControllerTest extends TestCase
     }
     public function testgoToMood() {
         // GIVEN Un formulaire par défault
-        $_POST['namepage'] = "defaut";
-        // WHEN dqs
-
+        $_POST['namepage'] = "humeur";
+        $_SESSION['util'] = 1; // Identifiant de l'utilisateur
+        // WHEN L'utilisateur clique sur le bouton 'voir une page'
         $view = $this->donneesController->goToMood($this->pdo);
         // THEN
+        // 1. Il est rediriger vers la page des humeurs
+        self::assertEquals("check-your-mood/views/humeur",$view->getRelativePath());
     }
 
     public function testChangementPageUpdateHumeur() {
@@ -88,7 +90,7 @@ class DonneesControllerTest extends TestCase
         $_POST['dateHumeur'] = date('Y-m-d');
         $_POST['heure'] = date('H');
         $_POST['humeur'] = 22;
-        $_SESSION['util'] = 10;
+        $_SESSION['util'] = 1;
         $_POST['contexte'] = "Contexte saisie par l'utilisateur";
         // WHEN Il valide la saisie de son humeur
         $view = $this->donneesController->insertHumeur($this->pdo);
