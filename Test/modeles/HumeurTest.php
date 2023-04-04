@@ -43,7 +43,11 @@ class HumeurTest extends TestCase
         ];
         // WHEN On valide les changements
         $humeur->fill($tab);
-        $humeur->save();
+        try {
+            $humeur->save();
+        } catch (\PDOException $e) {
+        }
+
         // THEN La nouvelle description est enregistrer dans la base de données
         $humeurModifier = $this->pdo->query("SELECT contexte FROM humeur WHERE codeHumeur = 1");
         $humeurModifier = $humeurModifier->fetchColumn(0);

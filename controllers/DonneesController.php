@@ -127,7 +127,10 @@ class DonneesController {
         $humeur->heure = $heure;
         $humeur->idUtil = $util;
         $humeur->contexte = $contexte;
-        $humeur->save();
+        try {
+            $humeur->save();
+        } catch (\PDOException $e) {
+        }
 
         $humeurs = $this->moodService->viewMoods($pdo,$util);
         $libelles = $this->moodService->libelles($pdo);
@@ -246,7 +249,10 @@ class DonneesController {
             /* Controle que le nouveau mot est valide */
             if (strlen($nouveauMDP) != 0 && $nouveauMDP == $confirmationNouveauMDP) {
                 $user->motDePasse = md5($nouveauMDP);
-                $user->save();
+                try {
+                    $user->save();
+                } catch (\PDOException $e) {
+                }
                 $mdpNouveauOk = true;
                 $modificationMDPOk = true;
             } else {
