@@ -56,12 +56,10 @@ class Table extends \stdClass
     }
 
     /**
-     * Associe les attributs de l'objet lister dans 'fillable'
+     * Associe les attributs de l'objet listé dans 'fillable'
      * avec les valeurs passé en argument.
-     * Si un attribut n'est pas lister dans values alors on assignera
-     * la valeur null a l'attribut.
      * @param array $values Les valeurs a associer aux attributs de l'objet
-     *               sous forme d'un tableau ['clef' => 'valeur' , ...]
+     *sous forme d'un tableau ['clef' => 'valeur' , ...]
      */
     public function fill(array $values) {
         if (array_key_exists($this->getIdKeyName(),$values)) {
